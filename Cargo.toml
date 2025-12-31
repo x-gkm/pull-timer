@@ -4,5 +4,6 @@ version = "0.1.0"
 edition = "2024"
 description = 'A simple "pull" timer'
 license = "MIT OR Apache-2.0"
+repository = "https://github.com/x-gkm/pull-timer"
 
 [dependencies]
