@@ -72,8 +72,12 @@ impl<T> PullTimer<T> {
 
         Some(sum)
     }
+}
 
-    pub fn poll(&mut self) -> Option<T> {
+impl<T> Iterator for PullTimer<T> {
+    type Item = T;
+
+    fn next(&mut self) -> Option<T> {
         let &(delta, _) = self.0.front()?;
 
         if delta == 0 {
@@ -95,9 +99,9 @@ mod tests {
         timer.add(0, "testing");
         timer.add(0, "one two three");
 
-        assert_eq!(timer.poll(), Some("testing"));
-        assert_eq!(timer.poll(), Some("one two three"));
-        assert_eq!(timer.poll(), None);
+        assert_eq!(timer.next(), Some("testing"));
+        assert_eq!(timer.next(), Some("one two three"));
+        assert_eq!(timer.next(), None);
     }
 
     #[test]
@@ -111,11 +115,11 @@ mod tests {
 
         timer.tick(4);
 
-        assert_eq!(timer.poll(), Some("this"));
-        assert_eq!(timer.poll(), Some("is"));
-        assert_eq!(timer.poll(), Some("a"));
-        assert_eq!(timer.poll(), Some("test"));
-        assert_eq!(timer.poll(), None);
+        assert_eq!(timer.next(), Some("this"));
+        assert_eq!(timer.next(), Some("is"));
+        assert_eq!(timer.next(), Some("a"));
+        assert_eq!(timer.next(), Some("test"));
+        assert_eq!(timer.next(), None);
     }
 
     #[test]
@@ -129,7 +133,7 @@ mod tests {
         timer.add(10, 10);
 
         for i in 0..=41 {
-            if let Some(value) = timer.poll() {
+            if let Some(value) = timer.next() {
                 assert_eq!(value, i);
             }
             timer.tick(1);
@@ -145,13 +149,13 @@ mod tests {
         timer.add(10, "there");
 
         assert_eq!(timer.next_in(), Some(0));
-        assert_eq!(timer.poll(), Some("hi"));
+        assert_eq!(timer.next(), Some("hi"));
 
         assert_eq!(timer.next_in(), Some(10));
 
         timer.tick(10);
         assert_eq!(timer.next_in(), Some(0));
-        assert_eq!(timer.poll(), Some("there"));
+        assert_eq!(timer.next(), Some("there"));
 
         timer.tick(3);
         assert_eq!(timer.next_in(), Some(7));
@@ -181,7 +185,7 @@ mod tests {
         assert_eq!(timer.remove(10), Some(10));
 
         for i in 0..=41 {
-            if let Some(value) = timer.poll() {
+            if let Some(value) = timer.next() {
                 assert_eq!(value, i);
             }
             timer.tick(1);
