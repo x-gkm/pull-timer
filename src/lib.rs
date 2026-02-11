@@ -14,7 +14,7 @@ impl<T> PullTimer<T> {
         self.0.front().map(|&(deadline, _)| deadline)
     }
 
-    pub fn update(&mut self, elapsed: u32) {
+    pub fn tick(&mut self, elapsed: u32) {
         let mut remaining = elapsed;
         for (delta, _) in &mut self.0 {
             let temp = *delta;
@@ -109,7 +109,7 @@ mod tests {
         timer.add(2, "is");
         timer.add(1, "this");
 
-        timer.update(4);
+        timer.tick(4);
 
         assert_eq!(timer.poll(), Some("this"));
         assert_eq!(timer.poll(), Some("is"));
@@ -132,7 +132,7 @@ mod tests {
             if let Some(value) = timer.poll() {
                 assert_eq!(value, i);
             }
-            timer.update(1);
+            timer.tick(1);
         }
     }
 
@@ -149,11 +149,11 @@ mod tests {
 
         assert_eq!(timer.next_in(), Some(10));
 
-        timer.update(10);
+        timer.tick(10);
         assert_eq!(timer.next_in(), Some(0));
         assert_eq!(timer.poll(), Some("there"));
 
-        timer.update(3);
+        timer.tick(3);
         assert_eq!(timer.next_in(), Some(7));
     }
 
@@ -162,7 +162,7 @@ mod tests {
         let mut timer = PullTimer::new();
 
         timer.add(100, "boom!");
-        timer.update(50);
+        timer.tick(50);
         assert_eq!(timer.remove("boom!"), Some(50));
         assert_eq!(timer.next_in(), None);
     }
@@ -184,7 +184,7 @@ mod tests {
             if let Some(value) = timer.poll() {
                 assert_eq!(value, i);
             }
-            timer.update(1);
+            timer.tick(1);
         }
     }
 }
